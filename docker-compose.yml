@@ -1,0 +1,33 @@
+# Las credenciales llegan por env_file (.env, gitignored). Nunca en este archivo.
+services:
+  gateway:
+    build: .
+    env_file: [.env, .env.profile]
+    environment:
+      RATE_LIMIT_STORAGE_URI: redis://redis:6379/0
+      UPSTREAM_BASE_URL: ${DOCKER_UPSTREAM_BASE_URL:-http://mock-upstream:9000}
+      LOG_FILE: logs/gateway.log
+    ports: ["8000:8000"]
+    volumes: ["./logs:/srv/logs"]
+    depends_on:
+      redis: {condition: service_healthy}
+      mock-upstream: {condition: service_started}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      retries: 3
+
+  mock-upstream:
+    build: .
+    command: ["uvicorn", "mock_upstream.app:app", "--host", "0.0.0.0", "--port", "9000", "--no-server-header"]
+    environment:
+      MOCK_TIMEOUT_SECONDS: "45"
+    ports: ["9000:9000"]
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 5

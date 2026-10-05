@@ -1,0 +1,27 @@
+# Secretos y configuracion local: NUNCA versionar
+.env
+.env.*
+!.env.example
+.demo_keys
+*.pem
+*.key
+
+# Artefactos generados
+logs/*
+!logs/.gitkeep
+evidence/*
+!evidence/.gitkeep
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+
+# IDE / SO
+.vscode/
+.idea/
+.DS_Store

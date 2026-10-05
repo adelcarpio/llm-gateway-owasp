@@ -1,0 +1,17 @@
+# Reglas por defecto de gitleaks + reglas especificas de este gateway.
+title = "llm-gateway"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "anthropic-api-key"
+description = "Anthropic API key (no incluida en las reglas por defecto de gitleaks 8.21)"
+regex = '''sk-ant-(?:api03|admin01)-[A-Za-z0-9_\-]{93}AA'''
+keywords = ["sk-ant-"]
+
+[[rules]]
+id = "llm-gateway-client-key"
+description = "Key de cliente del gateway emitida por scripts/bootstrap_env.py"
+regex = '''gk_[A-Za-z0-9_\-]{40,}'''
+keywords = ["gk_"]
