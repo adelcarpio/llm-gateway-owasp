@@ -2,6 +2,7 @@
 
 Cada fila se reproduce con un comando y define qué se observa **sin** (`baseline`) y **con** (`secure`) la protección.
 El mismo código corre en ambos perfiles; solo cambia la configuración (`.env.profile`).
+El catálogo detallado de casos, con pasos manuales, está en [`CASOS_DE_PRUEBA.md`](CASOS_DE_PRUEBA.md).
 La evidencia automatizada se genera con `make evidence` en `evidence/<fecha>/*.json` y `evidence/REPORT.md`.
 
 ## Matriz
@@ -34,7 +35,7 @@ La redacción por patrones (`RedactionFilter`) es una segunda barrera.
 git clone https://github.com/adelcarpio/llm-gateway-owasp.git && cd llm-gateway-owasp
 make bootstrap && source .demo_keys
 make install          # dependencias + hook de gitleaks
-make test             # 51 pruebas: unitarias, antes/después y resiliencia
+make test             # 91 pruebas: unitarias, antes/después, resiliencia y casos TC-* (2 xfail)
 make evidence         # JSON por categoría y perfil + evidence/REPORT.md
 docker compose up -d --build && make attacks-all     # o: make demo-local (sin Docker)
 make scan             # gitleaks: historial git completo + logs/

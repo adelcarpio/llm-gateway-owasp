@@ -4,6 +4,8 @@ Simula un modelo VULNERABLE para que la evidencia sea reproducible:
   - Obedece instrucciones de anulacion (responde "PWNED")       -> demo LLM01
   - Revela su system prompt si se le pide su configuracion       -> demo LLM07
 Fallos inyectables: POST /_mode {"mode": "ok|timeout|500|429|401|503"} -> demo resiliencia.
+Inspeccion: GET /_last devuelve el cuerpo de la ultima solicitud recibida (sin cabeceras),
+para verificar a mano que llego al proveedor (max_tokens, spotlighting, canary).
 """
 from __future__ import annotations
 
@@ -16,7 +18,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 app = FastAPI(title="Mock LLM upstream")
-STATE = {"mode": os.getenv("MOCK_MODE", "ok"), "calls": 0,
+STATE = {"mode": os.getenv("MOCK_MODE", "ok"), "calls": 0, "last_request": None,
          "timeout_seconds": float(os.getenv("MOCK_TIMEOUT_SECONDS", "45"))}
 
 _OVERRIDE = re.compile(r"\b(ignora|olvida|ignore|forget|disregard)\b.{0,40}\b(instrucciones|instructions|reglas|rules)\b")
@@ -35,6 +37,7 @@ def _understand(text: str) -> str:
 async def completions(request: Request):
     STATE["calls"] += 1
     body = await request.json()
+    STATE["last_request"] = body
     mode = STATE["mode"]
     if mode == "timeout":
         await asyncio.sleep(STATE["timeout_seconds"])
@@ -84,7 +87,12 @@ async def stats():
     return {"calls": STATE["calls"], "mode": STATE["mode"]}
 
 
+@app.get("/_last")
+async def last():
+    return {"last_request": STATE["last_request"]}
+
+
 @app.post("/_reset")
 async def reset():
-    STATE.update(calls=0, mode="ok")
+    STATE.update(calls=0, mode="ok", last_request=None)
     return {"calls": 0, "mode": "ok"}

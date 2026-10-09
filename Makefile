@@ -5,7 +5,7 @@ PY ?= python3
 
 .PHONY: help install bootstrap up down logs run run-mock baseline secure reset mock-mode \
         test evidence report attack-llm10 attack-llm01 attack-llm02 attack-llm07 attack-upstream \
-        attacks-all demo-local scan clean-logs
+        attacks-all demo-local scan clean-logs test-casos attack-extra
 
 help:  ## Lista de comandos
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## ' $(MAKEFILE_LIST) | awk -F':.*?## ' '{printf "  %-18s %s\n", $$1, $$2}'
@@ -73,6 +73,12 @@ attack-llm07:  ## Ataque LLM07; en secure desactiva el sanitizador para aislar l
 
 attack-upstream:  ## Fallos upstream y circuit breaker (PROFILE=baseline|secure)
 	./scripts/switch_profile.sh $(PROFILE) && $(MAKE) -s reset && ./attacks/upstream_failures.sh
+
+attack-extra:  ## Casos complementarios TC-* de docs/CASOS_DE_PRUEBA.md (PROFILE=baseline|secure)
+	./scripts/switch_profile.sh $(PROFILE) && $(MAKE) -s reset && ./attacks/casos_extra.sh
+
+test-casos:  ## Solo los casos TC-* automatizados (antes/despues)
+	$(PY) -m pytest -v -rxX tests/casos
 
 demo-local:  ## Demo completa antes/despues SIN Docker (uvicorn local)
 	./scripts/local_demo.sh

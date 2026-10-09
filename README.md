@@ -6,6 +6,7 @@ Gateway FastAPI que actúa como **único punto de entrada** (`POST /v1/chat`) ha
 
 > Proyecto final · Fundamentos de Arquitectura de LLMs · Opción 4.
 > Mapeo completo y procedimiento de evidencia: [`docs/OWASP_MAPPING.md`](docs/OWASP_MAPPING.md).
+> Casos de prueba antes/después con pasos manuales: [`docs/CASOS_DE_PRUEBA.md`](docs/CASOS_DE_PRUEBA.md).
 
 ## Arquitectura
 
@@ -24,7 +25,7 @@ cliente ──POST /v1/chat──▶ 1 Auth (HMAC) → 2 Cuota por client_id (LL
 | `app/observability/secure_logger.py` | Evento de auditoría por allowlist + redacción |
 | `mock_upstream/app.py` | Proveedor simulado vulnerable y determinista, con fallos inyectables |
 | `attacks/` | Ataques reproducibles con `curl` |
-| `tests/` | Unitarias, seguridad antes/después en ambos perfiles, resiliencia |
+| `tests/` | Unitarias, seguridad antes/después en ambos perfiles, resiliencia, casos `TC-*` (`tests/casos/`) |
 
 ## Perfiles `baseline` y `secure`
 
@@ -43,7 +44,7 @@ Requisitos: Python 3.12, `make`, `curl`, `jq`; Docker opcional; [gitleaks](https
 make bootstrap          # genera .env, .env.profile y .demo_keys (gitignored)
 source .demo_keys       # exporta DEMO_CLIENT_KEY_A y DEMO_CLIENT_KEY_B
 make install            # dependencias + hook pre-commit de gitleaks
-make test               # 51 pruebas
+make test               # 91 pruebas (89 passed + 2 xfail de brechas conocidas)
 ```
 
 **Con Docker** (gateway + mock + Redis):
@@ -78,7 +79,7 @@ Con Docker exporta además `DOCKER_UPSTREAM_BASE_URL`. La evidencia oficial usa 
 ## Comandos
 
 `make help` lista todos: `bootstrap`, `up`, `down`, `run`, `run-mock`, `baseline`, `secure`, `reset`, `mock-mode`,
-`test`, `evidence`, `report`, `attack-*`, `attacks-all`, `demo-local`, `scan`, `clean-logs`.
+`test`, `test-casos`, `evidence`, `report`, `attack-*` (incl. `attack-extra`), `attacks-all`, `demo-local`, `scan`, `clean-logs`.
 
 ## Seguridad del repositorio
 
