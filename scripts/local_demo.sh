@@ -37,6 +37,7 @@ for c in "${CASES[@]}"; do
       llm02) ./attacks/llm02_disclosure.sh ;;
       llm07) ./attacks/llm07_leak.sh ;;
       upstream) ./attacks/upstream_failures.sh ;;
+      extra) ./attacks/casos_extra.sh ;;
     esac
   done
 done
